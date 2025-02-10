@@ -1,6 +1,6 @@
 # `CSV.parse`, `CSV.stringify` — a capable, easy-to-use CSV parser
 
-This is a JavaScript module that can parse and create CSV files.
+This is a TypeScript module that can parse and create CSV files.
 The parser can be configured with different options to separate table cells (like `,` or tabs), different string delimiters (like `"` or `'`); it can read inputs as a string or as a file (with line ends of any OS).
 
 ## Why?
@@ -18,16 +18,16 @@ In the end, this was just a programming challenge for me.
 
 The CSV parser is an ECMAScript 6 module, so it can be imported like this:
 
-```js
-import CSV from "/path/to/CSV.js";
+```ts
+import CSV from "/path/to/CSV.ts";
 
 // Use CSV.parse and CSV.stringify here.
 ```
 
 In Node.js, the default import might create a module object with a `default` property, so you might need to use this instead:
 
-```js
-const CSV = (await import("/path/to/CSV.js")).default;
+```ts
+const CSV = (await import("/path/to/CSV.ts")).default;
 
 // Use CSV.parse and CSV.stringify here.
 ```
@@ -80,7 +80,7 @@ Note: in the following examples, `⟨SP⟩` means the literal space character U+
 
 ### `CSV.parse`
 
-```js
+```ts
 const {
   header,
   rows,
@@ -178,7 +178,7 @@ An array representing the remaining rows as objects whose key–value pairs are 
 
 #### Examples:
 
-```js
+```ts
 const csvString = `Country,Capital City
 Germany,Berlin
 Italy,Rome
@@ -211,7 +211,7 @@ const countries = CSV.parse(csvString);
 }
 ```
 
-```js
+```ts
 const csvString = `Music Genre;Number of Songs
 'Rock''n''Roll';4145
 'Drum'n'Bass';513
@@ -251,7 +251,7 @@ const music = CSV.parse(csvString, {
 }
 ```
 
-```js
+```ts
 const csvString = `Column 1;Column 2
 Value 1a,Value 2a
 Value 1b\tValue 2b`;
@@ -282,7 +282,7 @@ const example = CSV.parse(csvString, {
 
 ### `CSV.stringify`
 
-```js
+```ts
 const csvString = CSV.stringify(
     input,
     {
@@ -348,7 +348,7 @@ This is the output of the stringifier: a valid CSV string, given the inputs.
 
 Taking the parsing example from above:
 
-```js
+```ts
 const countriesCSV = CSV.stringify(countries, {
     quote: "'",
     separator: ";",
@@ -363,7 +363,7 @@ Ukraine;Kyiv
 `
 ```
 
-```js
+```ts
 const exampleCSV1 = CSV.stringify([
     [ "Column 1", "Column 2", "", "" ],
     [ "Value 1a", "Value 2a" ],

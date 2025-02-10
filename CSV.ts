@@ -1,11 +1,12 @@
 /* eslint no-unused-vars: [ "error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" } ] */
 /* eslint no-trailing-spaces: [ "error", { "skipBlankLines": true } ] */
+/* eslint @typescript-eslint/no-explicit-any: "off" */
 
 export default (() => {
     const toCharArray = (() => {
-        const maxSingleChar = (element) => typeof element === "string" && element.length <= 1;
+        const maxSingleChar = (element: any) => typeof element === "string" && element.length <= 1;
         
-        return (object) => {
+        return (object: any) => {
           if(typeof object === "string"){
             return Array.from(object);
           }
@@ -17,11 +18,11 @@ export default (() => {
           return [];
         };
       })(),
-      validQuotesAndSeparators = (character) => character !== "" && character !== "\n" && character !== "\r",
+      validQuotesAndSeparators = (character: string) => character !== "" && character !== "\n" && character !== "\r",
       space = " ",
       strictLineBreakGroups = /\r\n|\r/gu,
       looseLineBreakGroups = /\r\n|\n\r|\r/gu,
-      reduceClass = (characterClasses) => {
+      reduceClass = (characterClasses: string[]) => {
         if(characterClasses.length === 1){
           return characterClasses[0];
         }
@@ -43,7 +44,7 @@ export default (() => {
         return "other";
       },
       transition = (() => {
-        const states = {
+        const states: { [key: string]: { [key: string]: string } } = {
             closed: {
               lineFeed: "finished",
               other: "open",
@@ -86,7 +87,7 @@ export default (() => {
             }
           };
         
-        return (parserState, reducedClass) => {
+        return (parserState: string, reducedClass: string) => {
           if(parserState === "empty"){
             if(reducedClass === "lineFeed"){
               return "discarded";
@@ -110,7 +111,7 @@ export default (() => {
             enumerable: false,
             writable: true,
             value: Object.freeze({
-              escape(string){
+              escape(string: string){
                 return String(string).replace(replacedChars, "\\$&");
               }
             }).escape
@@ -120,7 +121,7 @@ export default (() => {
         const {
             parseString
           } = {
-            parseString(string){
+            parseString(this: any, string: string){
               const {
                 quote,
                 ignoreSpacesAfterQuotedString
@@ -150,13 +151,13 @@ export default (() => {
           };
         
         return {
-          parseSubArrays(subArray){
+          parseSubArrays(this: any, subArray: string[]){
             return subArray.map(parseString, this);
           }
         };
       })(),
-      classifyCharacter = (character, quote, separators) => {
-        const characterClasses = [];
+      classifyCharacter = (character: string, quote: string, separators: string[]) => {
+        const characterClasses: string[] = [];
         
         if(character === "\n"){
           characterClasses.push("lineFeed");
@@ -181,12 +182,12 @@ export default (() => {
         
         return characterClasses;
       },
-      consume = (aggregator, character) => {
+      consume = (aggregator: any, character: string) => {
         const lastLine = aggregator.array.at(-1);
         
         lastLine[lastLine.length - 1] += character;
       },
-      discardCell = (aggregator) => {
+      discardCell = (aggregator: any) => {
         if(aggregator.array.at(-1).length > 1){
           aggregator.array.at(-1).pop();
         }
@@ -194,7 +195,7 @@ export default (() => {
         aggregator.parserState = "finished";
         aggregator.lineTaint = "none";
       },
-      endCell = (aggregator, characterClasses) => {
+      endCell = (aggregator: any, characterClasses: string[]) => {
         if(characterClasses.includes("separator")){
           aggregator.array.at(-1).push("");
         }
@@ -207,7 +208,7 @@ export default (() => {
         
         aggregator.parserState = "empty";
       },
-      lineTaintActivation = (aggregator, reducedClass) => {
+      lineTaintActivation = (aggregator: any, reducedClass: string) => {
         if(reducedClass === "quoteSeparator"){
           aggregator.lineTaint = "active";
         }
@@ -215,7 +216,7 @@ export default (() => {
           aggregator.lineTaint = "inactive";
         }
       },
-      tokenizeCells = (aggregator, character, index, string) => {
+      tokenizeCells = (aggregator: any, character: string, index: number, string: string) => {
         const characterClasses = classifyCharacter(character, aggregator.quote, aggregator.separators),
           reducedClass = reduceClass(characterClasses);
         let nextState = transition(aggregator.parserState, reducedClass);
@@ -264,7 +265,7 @@ export default (() => {
         
         return aggregator;
       },
-      getLength = ({ length }) => length,
+      getLength = ({ length }: { length: number }) => length,
       {
         toHashMap,
         mapHeaderKeys,
@@ -272,22 +273,22 @@ export default (() => {
         quoteString,
         toCSVLine
       } = {
-          toHashMap(row){
+          toHashMap(row: string[]){
             return row.reduce((hashMap, cell, index) => {
               hashMap[this[index]] = cell;
               
               return hashMap;
             }, {});
           },
-          mapHeaderKeys(key){
+          mapHeaderKeys(key: string){
             return (Object.hasOwn(this, key)
               ? this[key]
               : "");
           },
-          toRows(map){
+          toRows(map: any){
             return this.map(mapHeaderKeys, map);
           },
-          quoteString(cell){
+          quoteString(cell: string){
             cell = String(cell);
             
             const {
@@ -302,7 +303,7 @@ export default (() => {
             
             return cell;
           },
-          toCSVLine(line){
+          toCSVLine(line: string[]){
             const {
               separator,
               maxCellCount
@@ -315,7 +316,7 @@ export default (() => {
         };
     
     return {
-      parse(csv, { quote = "\"", separators = [ "," ], forceLineFeedAfterCarriageReturn = true, ignoreLineFeedBeforeEOF = true, ignoreSpacesAfterQuotedString = true, taintQuoteSeparatorLines = false } = {}){
+      parse(csv: string, { quote = "\"", separators = [ "," ], forceLineFeedAfterCarriageReturn = true, ignoreLineFeedBeforeEOF = true, ignoreSpacesAfterQuotedString = true, taintQuoteSeparatorLines = false } = {}){
         csv = csv.replace((forceLineFeedAfterCarriageReturn
           ? strictLineBreakGroups
           : looseLineBreakGroups), "\n");
@@ -354,10 +355,10 @@ export default (() => {
           mappedRows: rows.map(toHashMap, header)
         };
       },
-      stringify(object, { quote = "\"", separator = ",", lineEnd = "\n", trimEmpty = true, lineEndBeforeEOF = false } = {}){
-        let header = [],
-          rows = [],
-          mappedRows = [];
+      stringify(object: any, { quote = "\"", separator = ",", lineEnd = "\n", trimEmpty = true, lineEndBeforeEOF = false } = {}){
+        let header: string[] = [],
+          rows: string[][] = [],
+          mappedRows: any[] = [];
         
         quote = toCharArray(quote).filter(validQuotesAndSeparators)[0] ?? "\"";
         separator = toCharArray(separator).filter(validQuotesAndSeparators)[0] ?? ",";

@@ -10,7 +10,7 @@ There are a few coding patterns I use throughout the code:
 * Arrow IIFEs to return a function — or an object containing a function — with other variables encapsulated in the same scope.
   This is known as the [closure] pattern
 
-  ```js
+  ```ts
   const result = (() => {
       const encapsulated = value;
       
@@ -22,7 +22,7 @@ There are a few coding patterns I use throughout the code:
 
 * Method extraction for when I use a function that needs to bind a `this` context:
 
-  ```js
+  ```ts
   const {
     result
   } = {
@@ -269,7 +269,7 @@ Since `empty` and `unsettled` are very similar, `empty` doesn’t appear in the 
 
 Taking the example from above, `states["unsettled"]["quote"]` is the same as this:
 
-```js
+```ts
 ({
   lineFeed: "finished",
   other: "unquoted",
